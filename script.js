@@ -1,120 +1,84 @@
-@import url("https://fonts.googleapis.com/css?family=Muli&display=swap");
+/*
+Math.floor() function returns the largest integer less than or equal to a given number.
+For generating a random uppercase lowercase text random numbers symbols we use Charcode 
+http://stevehardie.com/2009/09/character-code-list-char-code/ */
 
-* {
-  --bg-color: #260960;
-  --color: rgb(0, 0, 0);
-  --btncolor: rgb(255,255,255);
-  --bg2-color: #cb2a11;
-  --togglebg: #333;
-  --roundcolor: #eef0f4;
-  --toggleslider: #111;
-  --togglesliderColor: #111;
-  /* --filter1: drop-shadow(-8px -8px 12px #ffffff)
-    drop-shadow(8px 8px 12px #c3c5c8);
-  --filter2: drop-shadow(-4px -4px 6px #ffffff) drop-shadow(4px 4px 6px #c3c5c8);
-  --filter3: drop-shadow(-2px -2px 3px #ffffff) drop-shadow(2px 2px 3px #c3c5c8); */
+function getRandomLower() {
+  return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+function getRandomUpper() {
+  return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
 }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--color);
-  font-family: "Muli", sans-serif;
+function getRandomNumber() {
+  return +String.fromCharCode(Math.floor(Math.random() * 10) + 48);
 }
 
-p {
-  margin: 5px 0;
+function getRandomSymbol() {
+  const symbols = "!@#$%^&*(){}[]=<>/,.";
+  return symbols[Math.floor(Math.random() * symbols.length)];
 }
 
-h1 {
-  margin: 10px 0 20px;
-  text-align: center;
-  align-items: center;
-}
+// adding a all functions into a object called randomFunc
+const randomFunc = {
+  lower: getRandomLower,
+  upper: getRandomUpper,
+  number: getRandomNumber,
+  symbol: getRandomSymbol,
+};
 
-input[type="checkbox"] {
-  margin-right: 0;
-}
+// adding a click event listner to generate button
+const generate = document.getElementById("generateBtn");
+generate.addEventListener("click", () => {
+  const length = document.getElementById("Passwordlength").value;
+  const hasUpper = document.getElementById("uppercase").checked;
+  const hasLower = document.getElementById("lowercase").checked;
+  const hasNumber = document.getElementById("numbers").checked;
+  const hasSymbol = document.getElementById("symbols").checked;
+  const result = document.getElementById("PasswordResult");
+  result.innerText = generatePassword(
+    hasLower,
+    hasUpper,
+    hasNumber,
+    hasSymbol,
+    length
+  );
+  // console.log(hasLower, hasUpper, hasNumber, hasSymbol);
+});
 
-.container {
-  padding: 20px;
-  width: 600px;
-  max-width: 100%;
-  background: var(--bg2-color);
-  border: 12px solid var(--bg2-color);
-  /* filter: var(--filter1); */
-  margin: auto;
-}
-
-.result-container {
-  background-color: var(--bg-color);
-  border: 12px solid var(--bg-color);
-  /* filter: var(--filter2); */
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  position: relative;
-  font-size: 18px;
-  letter-spacing: 1px;
-  height: 60px;
-  width: 100%;
-  margin-bottom: 35px;
-}
-
-textarea {
-  background: none;
-  border: none;
-  color: var(--btncolor);
-  font-size: 20px;
-  margin-top: auto;
-  outline: none;
-  resize: none;
-}
-
-.result-container .btn {
-  font-size: 20px;
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  height: 40px;
-  width: 40px;
-}
-
-.buttons {
-  display: flex;
-}
-
-.btn {
-  width: 50%;
-  border: none;
-  color: var(--btncolor);
-  cursor: pointer;
-  font-size: 16px;
-  padding: 8px 12px;
-  margin: 14px 5px 7px 5px;
-  background-color: var(--bg-color);
-  /* filter: var(--filter2); */
-}
-
-.btn:hover {
-  /* filter: var(--filter3); */
-  transition: 0.3s ease-in-out;
-}
-
-.setting {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 15px 0;
-}
-
-@media screen and (max-width: 400px) {
-  .result-container {
-    font-size: 14px;
+// function for generating random password
+function generatePassword(lower, upper, number, symbol, length) {
+    let generatedPassword = "";
+    const typesCount = lower + upper + number + symbol;
+    // filter out unchecked types
+    const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(
+      (item) => Object.values(item)[0]
+    );
+    // console.log(typesArr);
+  
+    // creating a loop for calling generator function for each type
+    for (let i = 0; i < length; i += typesCount) {
+      typesArr.forEach((type) => {
+        const funcName = Object.keys(type)[0];
+        generatedPassword += randomFunc[funcName]();
+      });
+    }
+  
+    // slicing password from 0 to length
+    const finalPassword = generatedPassword.slice(0, length);
+    return finalPassword;
   }
-}
+  
+  // copy to clipboard
+let button = document.getElementById("clipboardBtn");
+// add click event listner on button
+button.addEventListener("click", (e) => {
+  e.preventDefault();
+  // execute command for copy text by selecting textarea text with id
+  document.execCommand(
+    "copy",
+    false,
+    document.getElementById("PasswordResult").select()
+  );
+});
