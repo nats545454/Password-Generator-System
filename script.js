@@ -1,84 +1,63 @@
-/*
-Math.floor() function returns the largest integer less than or equal to a given number.
-For generating a random uppercase lowercase text random numbers symbols we use Charcode 
-http://stevehardie.com/2009/09/character-code-list-char-code/ */
+let inputSlider = document.getElementById("inputSlider");
+let sliderValue = document.getElementById("sliderValue");
+let passBox = document.getElementById("passBox");
+let lowercase = document.getElementById("lowercase");
+let uppercase = document.getElementById("uppercase");
+let numbers = document.getElementById("numbers");
+let symbols = document.getElementById("symbols");
+let genBtn = document.getElementById("genBtn");
+let copyIcon = document.getElementById("copyIcon");
 
-function getRandomLower() {
-  return String.fromCharCode(Math.floor(Math.random() * 26) + 97);
-}
 
-function getRandomUpper() {
-  return String.fromCharCode(Math.floor(Math.random() * 26) + 65);
-}
-
-function getRandomNumber() {
-  return +String.fromCharCode(Math.floor(Math.random() * 10) + 48);
-}
-
-function getRandomSymbol() {
-  const symbols = "!@#$%^&*(){}[]=<>/,.";
-  return symbols[Math.floor(Math.random() * symbols.length)];
-}
-
-// adding a all functions into a object called randomFunc
-const randomFunc = {
-  lower: getRandomLower,
-  upper: getRandomUpper,
-  number: getRandomNumber,
-  symbol: getRandomSymbol,
-};
-
-// adding a click event listner to generate button
-const generate = document.getElementById("generateBtn");
-generate.addEventListener("click", () => {
-  const length = document.getElementById("Passwordlength").value;
-  const hasUpper = document.getElementById("uppercase").checked;
-  const hasLower = document.getElementById("lowercase").checked;
-  const hasNumber = document.getElementById("numbers").checked;
-  const hasSymbol = document.getElementById("symbols").checked;
-  const result = document.getElementById("PasswordResult");
-  result.innerText = generatePassword(
-    hasLower,
-    hasUpper,
-    hasNumber,
-    hasSymbol,
-    length
-  );
-  // console.log(hasLower, hasUpper, hasNumber, hasSymbol);
+// Showing input slider value 
+sliderValue.textContent = inputSlider.value;
+inputSlider.addEventListener('input', ()=>{
+    sliderValue.textContent = inputSlider.value;
 });
 
-// function for generating random password
-function generatePassword(lower, upper, number, symbol, length) {
-    let generatedPassword = "";
-    const typesCount = lower + upper + number + symbol;
-    // filter out unchecked types
-    const typesArr = [{ lower }, { upper }, { number }, { symbol }].filter(
-      (item) => Object.values(item)[0]
-    );
-    // console.log(typesArr);
-  
-    // creating a loop for calling generator function for each type
-    for (let i = 0; i < length; i += typesCount) {
-      typesArr.forEach((type) => {
-        const funcName = Object.keys(type)[0];
-        generatedPassword += randomFunc[funcName]();
-      });
+genBtn.addEventListener('click', ()=>{
+    passBox.value = generatePassword();
+})
+
+let lowerChars = "abcdefghijklmnopqrstuvwxyz";
+let upperChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+let allNumbers = "0123456789";
+let allSymbols = "~!@#$%^&*"; 
+
+// Function to generate Password
+function generatePassword(){
+    let genPassword = "";
+    let allChars = "";
+
+    allChars  += lowercase.checked ? lowerChars : "";
+    allChars  += uppercase.checked ? upperChars : "";
+    allChars  += numbers.checked ? allNumbers : "";
+    allChars  += symbols.checked ? allSymbols : "";
+
+
+    if(allChars == "" || allChars.length == 0){
+        return genPassword;
     }
-  
-    // slicing password from 0 to length
-    const finalPassword = generatedPassword.slice(0, length);
-    return finalPassword;
-  }
-  
-  // copy to clipboard
-let button = document.getElementById("clipboardBtn");
-// add click event listner on button
-button.addEventListener("click", (e) => {
-  e.preventDefault();
-  // execute command for copy text by selecting textarea text with id
-  document.execCommand(
-    "copy",
-    false,
-    document.getElementById("PasswordResult").select()
-  );
+    
+
+    let i = 1;
+    while(i<=inputSlider.value){
+        genPassword += allChars.charAt(Math.floor(Math.random() * allChars.length));
+        i++;
+    }
+
+    return genPassword;
+}
+
+copyIcon.addEventListener('click', ()=>{
+    if(passBox.value != "" || passBox.value.length >=1){
+        navigator.clipboard.writeText(passBox.value);
+        copyIcon.innerText = "check";
+        copyIcon.title = "Password Copied";
+
+        setTimeout(()=>{
+            copyIcon.innerHTML = "content_copy";
+            copyIcon.title = "";
+        }, 3000)
+    }
 });
